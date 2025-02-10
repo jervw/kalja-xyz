@@ -3,8 +3,8 @@
  * and interact with the Svelte i18n library.
  */
 
-import { init, getLocaleFromNavigator, register, locale as $locale } from 'svelte-i18n';
-import { writable, get } from 'svelte/store';
+import { getLocaleFromNavigator, init, locale as $locale, register } from 'svelte-i18n';
+import { get, writable } from 'svelte/store';
 import { base } from '$app/paths';
 import { getCardUrl, Language } from '$lib/languages/language';
 import { type Card } from '$lib/interfaces/card';
@@ -24,7 +24,7 @@ interface LanguageData {
  * A writable store holding the language data for each language, which is persisted in the browser's localStorage.
  */
 const languageData = writable<Record<Language, LanguageData>>(
-	isBrowser ? JSON.parse(localStorage.getItem('languageData') || '{}') : {}
+	isBrowser ? JSON.parse(localStorage.getItem('languageData') || '{}') : {},
 );
 
 // Only persist to localStorage on the client side.
@@ -48,7 +48,7 @@ export function registerLocales(fetchFn: typeof fetch) {
  */
 init({
 	fallbackLocale: 'en',
-	initialLocale: getLocaleFromNavigator()?.split('-')[0]
+	initialLocale: getLocaleFromNavigator()?.split('-')[0],
 });
 
 /**
@@ -63,7 +63,7 @@ async function fetchAndFilterCards(
 	language: Language,
 	includedTags: Tag[],
 	excludedTags: Tag[],
-	seed: number
+	seed: number,
 ): Promise<Card[]> {
 	try {
 		const response = await fetch(getCardUrl(language));
@@ -74,14 +74,14 @@ async function fetchAndFilterCards(
 		const includedCards = cards.filter(
 			(card) =>
 				card.tags.some((tag) => includedTags.includes(tag)) ||
-				(includedTags.includes(Tag.UNTAGGED) && card.tags.length === 0)
+				(includedTags.includes(Tag.UNTAGGED) && card.tags.length === 0),
 		);
 
 		// Exclude cards that contain at least one of the excluded tags.
 		const filteredCards = includedCards.filter(
 			(card) =>
 				!card.tags.some((tag) => excludedTags.includes(tag)) &&
-				!(excludedTags.includes(Tag.UNTAGGED) && card.tags.length === 0)
+				!(excludedTags.includes(Tag.UNTAGGED) && card.tags.length === 0),
 		);
 
 		return seededShuffle(filteredCards, seed);
@@ -101,19 +101,19 @@ async function fetchAndFilterCards(
 async function createCards(
 	cardAmount: number,
 	includedTags: Tag[],
-	excludedTags: Tag[]
+	excludedTags: Tag[],
 ): Promise<Record<Language, LanguageData> | null> {
 	try {
 		const seed = Math.random();
 
 		const [fiShuffledCards, enShuffledCards] = await Promise.all([
 			fetchAndFilterCards(Language.FI, includedTags, excludedTags, seed),
-			fetchAndFilterCards(Language.EN, includedTags, excludedTags, seed)
+			fetchAndFilterCards(Language.EN, includedTags, excludedTags, seed),
 		]);
 
 		return {
 			[Language.FI]: { cards: fiShuffledCards.slice(0, cardAmount), language: Language.FI },
-			[Language.EN]: { cards: enShuffledCards.slice(0, cardAmount), language: Language.EN }
+			[Language.EN]: { cards: enShuffledCards.slice(0, cardAmount), language: Language.EN },
 		};
 	} catch (error) {
 		console.error('Failed to create cards:', error);
@@ -156,7 +156,7 @@ export async function loadCards(includedTags: Tag[], excludedTags: Tag[]): Promi
 export async function loadSingleCard(
 	cardIndex: number,
 	includedTags: Tag[],
-	excludedTags: Tag[]
+	excludedTags: Tag[],
 ): Promise<void> {
 	try {
 		const currentData = get(languageData);

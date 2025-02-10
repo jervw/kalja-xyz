@@ -5,7 +5,7 @@ import { base } from '$app/paths';
  */
 export enum Language {
 	FI = 'fi',
-	EN = 'en'
+	EN = 'en',
 }
 
 /**

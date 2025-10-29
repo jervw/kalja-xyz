@@ -26,7 +26,7 @@ jobs:
       - name: Generate badge JSON
         run: |
           jq -n --slurpfile cov coverage/coverage-summary.json \
-            '{schemaVersion:1,label:"coverage",message:($cov[0].total.statements.pct|tostring)+"%",color:"blue"}' \
+            '{schemaVersion:1,label:"coverage",message:($cov[0].total.statements.pct|tostring + "%"),color:"blue"}' \
             > coverage-badge.json
 
       - name: Upload badge artifact
@@ -35,3 +35,5 @@ jobs:
           name: coverage-badge
           path: coverage-badge.json
 
+
+          
